@@ -20,8 +20,8 @@ public class CameraController : MonoBehaviour {
     private float levelWidth;
     private float levelHeight;
 
-    private float minFOV = 30f;
-    private float maxFOV = 10f;
+    private float maxHeight;
+    private float minHeight = 20f;
 
 
 
@@ -36,8 +36,10 @@ public class CameraController : MonoBehaviour {
         //....
         levelWidth = World.levelBreite;
         levelHeight = World.levelTiefe;
-        this.transform.position = new Vector3(levelWidth / 2, levelWidth * (levelHeight * 0.07f), levelHeight / 2);
-        offset = new Vector3(0, levelWidth * (levelHeight * 0.07f) , 0);
+        maxHeight = levelWidth * (levelHeight * 0.07f);
+        this.transform.position = new Vector3(levelWidth / 2, maxHeight, levelHeight / 2);
+       
+        offset = new Vector3(0, maxHeight , 0);
     }
 
     private void LateUpdate()
@@ -46,9 +48,11 @@ public class CameraController : MonoBehaviour {
         {
             return;
         }
+        if(Time.fixedTime > 3)
+        {
+            CameraMoving();
+        }
         
-        CameraMoving();
-        CameraZooming();
         
     }
 
@@ -56,18 +60,13 @@ public class CameraController : MonoBehaviour {
     {
         Vector3 centerPoint = CalcCenterPoint();
 
+        float zoom = Mathf.Lerp(minHeight, maxHeight, GetGreatestDistance() / (levelWidth + 1));
+        float dist = Mathf.Lerp(transform.position.y, zoom, speed * Time.deltaTime);
+        offset = new Vector3(0, dist, 0);
         Vector3 endPos = centerPoint + offset;
         Vector3 smoothPos = Vector3.Lerp(transform.position, endPos, speed * Time.deltaTime);
-        //Vector3 smoothPos2 = Vector3.SmoothDamp(transform.position, endPos, ref vel, speed/10 * Time.deltaTime);
         
         transform.position = smoothPos;
-        //transform.LookAt(new Vector3(transform.position.x, player.transform.position.y, transform.position.z));
-    }
-
-    void CameraZooming()
-    {
-        float zoom = Mathf.Lerp(maxFOV, minFOV, GetGreatestDistance() / (levelWidth + 1));
-        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, zoom, Time.deltaTime / 3);
     }
 
     float GetGreatestDistance()
