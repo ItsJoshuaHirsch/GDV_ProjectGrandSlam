@@ -46,7 +46,7 @@ public class PlayerScript : MonoBehaviour
             if (tmp != new Vector3(0, 0, 0))
             {
                 speedMulti();
-                wallTest(playerList[0]);
+                //wallTest(playerList[0]);
                 //Debug.Log("move" + body.name);
                 body.transform.Translate(tmp.x * speedMultiply  * Time.deltaTime, 0 , tmp.z * speedMultiply * Time.deltaTime);
             }
@@ -64,7 +64,7 @@ public class PlayerScript : MonoBehaviour
             if (tmp != new Vector3(0, 0, 0))
             {
                 speedMulti();
-                wallTest(playerList[1]);
+               // wallTest(playerList[1]);
                 //Debug.Log("move" + body.name);
                 body.transform.Translate(tmp.x * speedMultiply * Time.deltaTime, 0, tmp.z * speedMultiply * Time.deltaTime);
             }
@@ -81,7 +81,7 @@ public class PlayerScript : MonoBehaviour
             if (tmp != new Vector3(0, 0, 0))
             {
                 speedMulti();
-                wallTest(playerList[2]);
+                //wallTest(playerList[2]);
                 //Debug.Log("move" + body.name);
                 body.transform.Translate(tmp.x * speedMultiply * Time.deltaTime, 0, tmp.z * speedMultiply * Time.deltaTime);
             }
@@ -98,7 +98,7 @@ public class PlayerScript : MonoBehaviour
             if (tmp != new Vector3(0, 0, 0))
             {
                 speedMulti();
-                wallTest(playerList[3]);
+                //wallTest(playerList[3]);
                 //Debug.Log("move" + body.name);
                 body.transform.Translate(tmp.x * speedMultiply * Time.deltaTime, 0, tmp.z * speedMultiply * Time.deltaTime);
             }
@@ -332,7 +332,7 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    void wallTest(GameObject player)
+    /*void wallTest(GameObject player)
     {
         
         int xPos = (int)Mathf.Round(player.transform.position.x);
@@ -356,7 +356,7 @@ public class PlayerScript : MonoBehaviour
         {
             Debug.Log("Object an aktueller Stelle: Freier Weg");
         }
-    }
+    }*/
 
 }
 

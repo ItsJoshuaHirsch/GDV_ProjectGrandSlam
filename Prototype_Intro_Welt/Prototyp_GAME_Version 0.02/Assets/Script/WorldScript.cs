@@ -5,9 +5,15 @@ using UnityEngine.SceneManagement;
 
 public class WorldScript : MonoBehaviour {
 
+    public Camera camera;
 	public GameObject[,] WorldArray;
+    public List<GameObject[,]> world;
 	public int levelBreite;
  	public int levelTiefe;
+    public float neuWeltWert;
+    public int welten;
+    public float nextPosition;
+    public int indexWelten;
 	public GameObject levelWand;
 	public GameObject levelKiste;
 	public GameObject levelBogen;
@@ -20,8 +26,10 @@ public class WorldScript : MonoBehaviour {
 
 	void Awake()
 	{
-		levelBreite = 15;
-		levelTiefe = 15;
+        world = new List<GameObject[,]>();
+        levelBreite = 20;
+		levelTiefe = 20;
+        neuWeltWert = 1f;
 	}
 
 	void Start ()
@@ -31,36 +39,53 @@ public class WorldScript : MonoBehaviour {
 		WorldArray = new GameObject[levelBreite,levelTiefe];
 		levelBoden = Instantiate(levelBoden, new Vector3((levelBreite / 2f) - 0.5f, -0.5f, (levelTiefe / 2f) - 0.5f), Quaternion.identity);
 		levelBoden.transform.localScale = new Vector3((levelBreite), 1, (levelTiefe));
+        nextPosition = 0;
+        indexWelten = 0;
 
-		createWorld();
+		world.Add(createWorld(levelBreite,levelTiefe, WorldArray));
+        welten = 1;
 	}
 
 	void Update ()
 	{
-		if(Input.GetKeyDown("r"))
-		{
-			StopAllCoroutines();
-			SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-		}
+        camera.transform.Translate(0.1f, 0, 0, Space.World);
+        levelBoden.transform.Translate(0.1f,0,0);
+        Vector3 tmp = camera.transform.position;
+        //Debug.Log(tmp.ToString());
+        if (Mathf.Round(tmp.x) == neuWeltWert)
+        {
+            nextPosition += 40f;
+            Debug.Log("Welt");
+            GameObject [,] welt = new GameObject[levelBreite, levelTiefe];
+            createWorld(levelBreite, levelTiefe, welt);
+            world.Add(welt);
+            welten++;
+            neuWeltWert += 40f;
+        }
+        
+        if(welten == 2)
+        {
+            Debug.Log("Delet World");
+            world.RemoveAt(indexWelten);
+            indexWelten++;
+            welten--;
+        }
 	}
 
-	void createWorld()
+	GameObject[,] createWorld(int levelBreite, int levelTiefe, GameObject[,] world)
 	{
-		StartCoroutine(createWalls());
+		return createWalls(levelBreite, levelTiefe, world);
 	}
 
-
-	public IEnumerator createWalls()
+	public GameObject[,] createWalls(int levelBreite, int levelTiefe, GameObject[,] WorldArray)
 	{
-		WaitForSeconds delay = new WaitForSeconds(generationStepDelay);
   	for (int i = 0; i < levelBreite; i+=2)
    	{
     	for (int j = 0; j < levelTiefe; j+=2)
      	{
-				yield return delay;
 				//Generiert die Waende (jedes zweite Feld).
 				GameObject wand;
-				wand = Instantiate(levelWand, new Vector3(i, 0, j), Quaternion.Euler(0, elementRotation, 0));
+				wand = Instantiate(levelWand, new Vector3(i + nextPosition, 0, j), Quaternion.Euler(0, elementRotation, 0));
 				wand.name = "Wand";
 				wand.transform.parent = transform;
 				WorldArray[i,j] = wand;
@@ -69,7 +94,7 @@ public class WorldScript : MonoBehaviour {
 				if(((Mathf.Round(Random.value * 10)) % 4 == 0))
 				{
 					GameObject wand_saule;
-					wand_saule = Instantiate(levelWand, new Vector3(i, 1f, j), Quaternion.Euler(0, elementRotation, 0));
+					wand_saule = Instantiate(levelWand, new Vector3(i + nextPosition, 1f, j), Quaternion.Euler(0, elementRotation, 0));
 					wand_saule.name = "Wand_Saeule";
 					wand_saule.transform.parent = transform;
 					WorldArray[i,j] = wand_saule;
@@ -83,29 +108,28 @@ public class WorldScript : MonoBehaviour {
 					// elementRotation += 90f;
 					if(((Mathf.Round(Random.value * 10)) % 2 == 0))
 					{
-						Instantiate(levelWand, new Vector3(i, 1, j), Quaternion.Euler(0, elementRotation, 0));
-						Instantiate(levelWand, new Vector3(i, 2, j), Quaternion.Euler(0, elementRotation, 0));
-						Instantiate(levelWand, new Vector3(i+1, 2, j), Quaternion.Euler(0, elementRotation, 0));
-						Instantiate(levelWand, new Vector3(i+2, 1, j), Quaternion.Euler(0, elementRotation, 0));
-						Instantiate(levelWand, new Vector3(i+2, 2, j), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition, 1, j), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition, 2, j), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition + 1, 2, j), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition + 2, 1, j), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition + 2, 2, j), Quaternion.Euler(0, elementRotation, 0));
 					} else {
-						Instantiate(levelWand, new Vector3(i, 1, j), Quaternion.Euler(0, elementRotation, 0));
-						Instantiate(levelWand, new Vector3(i, 2, j), Quaternion.Euler(0, elementRotation, 0));
-						Instantiate(levelWand, new Vector3(i, 2, j+1), Quaternion.Euler(0, elementRotation, 0));
-						Instantiate(levelWand, new Vector3(i, 1, j+2), Quaternion.Euler(0, elementRotation, 0));
-						Instantiate(levelWand, new Vector3(i, 2, j+2), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition, 1, j), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition, 2, j), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition, 2, j+1), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition, 1, j+2), Quaternion.Euler(0, elementRotation, 0));
+						Instantiate(levelWand, new Vector3(i + nextPosition, 2, j+2), Quaternion.Euler(0, elementRotation, 0));
 					}
 
 				}
 			}
 		}
-		StartCoroutine(createBoxes());
+		return createBoxes(levelBreite, levelTiefe, WorldArray);
 	}
 
 
-	public IEnumerator createBoxes()
+	public GameObject[,] createBoxes(int levelBreite, int levelTiefe, GameObject[,] WorldArray)
 	{
-		WaitForSeconds delay = new WaitForSeconds(generationStepDelay);
 		for (int i = 0; i < levelBreite; i++)
 	 	{
 	  	for (int j = 0; j < levelTiefe; j++)
@@ -115,23 +139,23 @@ public class WorldScript : MonoBehaviour {
 				{
 					if((Mathf.Round(Random.value * 10)) % 3 == 0)
 					{
-						yield return delay;
 						kistenCounter++;
 						GameObject kiste;
-						kiste = Instantiate(levelKiste, new Vector3(i, 0, j), Quaternion.Euler(0, elementRotation, 0));
+						kiste = Instantiate(levelKiste, new Vector3(i + nextPosition, 0, j), Quaternion.Euler(0, elementRotation, 0));
 						kiste.transform.parent = transform;
 						kiste.name = "Kiste";
-						WorldArray[i,j] = kiste;
+						WorldArray[i, j] = kiste;
 						elementRotation += 90f;
 					}
 				}
 			}
   	    }
-		spawnItem();
+		return spawnItem(levelBreite, levelTiefe, WorldArray);
 	}
 
-	void spawnItem() {
-		for (int i = 0; i < levelBreite; i++)
+    GameObject[,] spawnItem(int levelBreite, int levelTiefe, GameObject[,] WorldArray)
+    {
+		for (int i = 0 ; i < levelBreite; i++)
 	 	{
 	  	for (int j = 0; j < levelTiefe; j++)
 	   	{
@@ -142,14 +166,14 @@ public class WorldScript : MonoBehaviour {
 					{
                         if ((Mathf.Round(Random.value * 10)) % 2 == 0) {
                             GameObject item;
-                            item = Instantiate(Item_BombPowerUp, new Vector3(i, 0, j), Quaternion.Euler(0, elementRotation, 0));
+                            item = Instantiate(Item_BombPowerUp, new Vector3(i + nextPosition, 0, j), Quaternion.Euler(0, elementRotation, 0));
                             item.transform.parent = transform;
                             item.name = "Item_BombPowerUp";
                             WorldArray[i, j] = item;
                             elementRotation += 90f;
                         } else {
                             GameObject item;
-                            item = Instantiate(Item_SpeedBoost_Prefab, new Vector3(i, 0, j), Quaternion.Euler(0, elementRotation, 0));
+                            item = Instantiate(Item_SpeedBoost_Prefab, new Vector3(i + nextPosition, 0, j), Quaternion.Euler(0, elementRotation, 0));
                             item.transform.parent = transform;
                             item.name = "Item_SpeedBoost";
                             WorldArray[i, j] = item;
@@ -159,5 +183,7 @@ public class WorldScript : MonoBehaviour {
 				}
 			}
 		}
-	}
+
+        return WorldArray;
+    }
 }
