@@ -13,7 +13,7 @@ public class WorldScript : MonoBehaviour {
     public float neuWeltWert;
     public int welten;
     public float nextPosition;
-    public int indexWelten;
+    public bool delete;
 	public GameObject levelWand;
 	public GameObject levelKiste;
 	public GameObject levelBogen;
@@ -40,9 +40,11 @@ public class WorldScript : MonoBehaviour {
 		levelBoden = Instantiate(levelBoden, new Vector3((levelBreite / 2f) - 0.5f, -0.5f, (levelTiefe / 2f) - 0.5f), Quaternion.identity);
 		levelBoden.transform.localScale = new Vector3((levelBreite), 1, (levelTiefe));
         nextPosition = 0;
-        indexWelten = 0;
+        delete = false;
 
 		world.Add(createWorld(levelBreite,levelTiefe, WorldArray));
+        world.Add(null);
+        world.Add(null);
         welten = 1;
 	}
 
@@ -54,25 +56,39 @@ public class WorldScript : MonoBehaviour {
         //Debug.Log(tmp.ToString());
         if (Mathf.Round(tmp.x) == neuWeltWert)
         {
+            if (delete)
+            {
+                GameObject[,] worlden = world[welten];
+                for (int i = 0; i < levelBreite; i++)
+                {
+                    for (int j = 0; j < levelTiefe; j++)
+                    {
+                        GameObject tmp2 = worlden[i, j];
+                        Destroy(tmp2);
+                    }
+                }
+            }
+
             nextPosition += 40f;
             Debug.Log("Welt");
             GameObject [,] welt = new GameObject[levelBreite, levelTiefe];
             createWorld(levelBreite, levelTiefe, welt);
-            world.Add(welt);
+            world[welten] = welt;
             welten++;
             neuWeltWert += 40f;
         }
-        
-        if(welten == 2)
+
+        if (welten == 3)
         {
             Debug.Log("Delet World");
-            world.RemoveAt(indexWelten);
-            indexWelten++;
-            welten--;
+            if (!delete)
+                delete = true;
+            welten = 0;
+            
         }
 	}
 
-	GameObject[,] createWorld(int levelBreite, int levelTiefe, GameObject[,] world)
+	public GameObject[,] createWorld(int levelBreite, int levelTiefe, GameObject[,] world)
 	{
 		return createWalls(levelBreite, levelTiefe, world);
 	}
@@ -153,7 +169,7 @@ public class WorldScript : MonoBehaviour {
 		return spawnItem(levelBreite, levelTiefe, WorldArray);
 	}
 
-    GameObject[,] spawnItem(int levelBreite, int levelTiefe, GameObject[,] WorldArray)
+    public GameObject[,] spawnItem(int levelBreite, int levelTiefe, GameObject[,] WorldArray)
     {
 		for (int i = 0 ; i < levelBreite; i++)
 	 	{
