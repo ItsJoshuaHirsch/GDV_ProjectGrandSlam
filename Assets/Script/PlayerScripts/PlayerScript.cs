@@ -131,7 +131,7 @@ public class PlayerScript : MonoBehaviour
                 //Player 1
                 case 0:
 
-                    tmp = checkSingleDirection(InputManager.OneMainJoystick());
+                    tmp = InputManager.OneMainJoystick();
 
                     if (InputManager.OneXButton() && !creatingBomb)
                         SetBomb();
@@ -203,6 +203,7 @@ public class PlayerScript : MonoBehaviour
                 //speichern des benutzten Bewegungsvectors
                 lastTmpVector = tmp;
             }
+            
 
             //Objekt zum target Bewegung
             tmpVectorPos = transform.position;
@@ -521,4 +522,15 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+        Debug.LogWarning(other);
+        if (other.gameObject.tag == "Wand")
+        {
+            if ((tmp.x - other.gameObject.transform.position.x) != 0)
+                tmp.x = 0;
+            if ((tmp.z - other.gameObject.transform.position.z) != 0)
+                tmp.z = 0;
+        }
+    }
 }

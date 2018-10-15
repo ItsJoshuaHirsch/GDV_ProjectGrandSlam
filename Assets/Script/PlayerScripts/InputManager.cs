@@ -10,7 +10,7 @@ public static class InputManager
         float r = 0.0f;
         r += Input.GetAxis("K_One_MainHorizontal");
         r += Input.GetAxis("XBOX_J_One_MainHorizontal");
-        return Mathf.Clamp(r, -1.0f, 1.0f);
+        return r;
     }
 
     // Z Werte werden abgefragt
@@ -19,7 +19,7 @@ public static class InputManager
         float r = 0.0f;
         r += Input.GetAxis("K_One_MainVertikal");
         r += Input.GetAxis("XBOX_J_One_MainVertikal");
-        return Mathf.Clamp(r, -1.0f, 1.0f);
+        return r;
     }
 
     // Zusammenfügen der X und Z Werten in einen Vector3
